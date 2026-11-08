@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import QRCode from 'qrcode';
 
-export const generateQRCodesPDF = async (voteUrls: URL[]) => {
+export const buildQRCodesPDF = async (voteUrls: URL[]): Promise<jsPDF> => {
     const doc = new jsPDF('p', 'mm', 'a4', true);
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
@@ -56,5 +56,10 @@ export const generateQRCodesPDF = async (voteUrls: URL[]) => {
 
     drawDashGrid();
 
+    return doc;
+  };
+
+export const generateQRCodesPDF = async (voteUrls: URL[]) => {
+    const doc = await buildQRCodesPDF(voteUrls);
     await doc.save('urls_with_qr_codes.pdf', { returnPromise: true });
   };
