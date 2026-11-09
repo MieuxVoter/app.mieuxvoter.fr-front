@@ -1,0 +1,41 @@
+name: Production smoke test
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check public and dynamic routes
+        run: |
+          set -euo pipefail
+          base="https://app.mieuxvoter.fr"
+
+          check_status() {
+            path="$1"
+            expected="$2"
+            status=$(curl -sS -o /dev/null -w "%{http_code}" --retry 3 --retry-delay 2 "$base$path")
+            echo "$path -> $status (expected $expected)"
+            test "$status" = "$expected"
+          }
+
+          check_not_500() {
+            path="$1"
+            status=$(curl -sS -o /dev/null -w "%{http_code}" --retry 3 --retry-delay 2 "$base$path")
+            echo "$path -> $status"
+            case "$status" in
+              200|404) ;;
+              *) exit 1 ;;
+            esac
+          }
+
+          check_status "/" "200"
+          check_status "/fr/faq" "200"
+          check_not_500 "/fr/votes/aaaa-bbbb-cccc"
+          check_not_500 "/fr/results/aaaa-bbbb-cccc"
