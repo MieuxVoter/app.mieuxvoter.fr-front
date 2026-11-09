@@ -33,4 +33,6 @@ yarn-error.log*
 # Local Netlify folder
 .netlify
 functions/next_*
-.env
+
+# IDEs
+/.idea
