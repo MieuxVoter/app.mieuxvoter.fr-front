@@ -18,14 +18,14 @@ locales = [
     name = "Mieux Voter Front End"
     description = """Front-end based on React for Better Vote (Mieux Voter)"""
     [[project.import]]
-        repository = "https://github.com/MieuxVoter/mv-front-react"
+        repository = "https://github.com/MieuxVoter/app.mieuxvoter.fr-front"
         revision = "default"
         path = "l10n.toml"
         vcs = "git"
 
     [[project.metadata]]
-        priority = 5
         locales = ["fr", "en"]
+        priority = 5
 
     [[project.metadata]]
         locales = ["de", "es", "ru"]
