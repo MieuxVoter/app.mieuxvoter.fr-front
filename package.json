@@ -71,7 +71,7 @@
 		"sass": "^1.96.0",
 		"sass-embedded": "^1.96.0",
 		"typescript-eslint": "^8.48.1",
-		"vitest": "3.2.6"
+		"vitest": "5.1.0"
 	},
 	"prettier": {
 		"trailingComma": "es5",
