@@ -9,7 +9,7 @@
   publish = ".next"
 
 [functions]
-  included_files = ["functions/**"]
+  included_files = ["functions/**", "public/locales/**", "next-i18next.config.js"]
 
 [env.production]
   SECRETS_SCAN_OMIT_PATHS = "functions/send-emails/index.ts,.netlify/functions-internal/___netlify-server-handler/functions/send-emails/index.ts"
