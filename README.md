@@ -22,12 +22,12 @@ The separation between the front-end and the back-end makes it easy to customize
 
 ## :gear: Install options
 
-**Option one:** One-click deploy
+### **Option one:** One-click deploy
 
 [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/MieuxVoter/majority-judgment-web-app&utm_source=github)
 
 
-**Option two:** Manual clone
+### **Option two:** Manual clone
 
 1. Clone this repo: `git clone https://github.com/MieuxVoter/app.mieuxvoter.fr-front.git`
 2. Navigate to the directory and install dependencies: `npm install` or `make`
@@ -35,9 +35,9 @@ The separation between the front-end and the back-end makes it easy to customize
 4. Make your changes
 5. Deploy your project.
 
-We advise for deploying the project to [Netlify](https://netlify.com), because we wrote the mail functions for the framework. Netlify parameters are written in `netlify.toml`.
+We recommend deploying the project to [Netlify](https://netlify.com), because we wrote the mail functions for the framework. Netlify parameters are written in `netlify.toml`.
 
-If you decide to deploy your project in another way, please fill a pull-request to guide futur users!
+If you decide to deploy your project in another way, please fill a pull request to guide future users!
 
 ## :incoming_envelope: Support for mail
 
