@@ -13,7 +13,7 @@ help:  ## Usage: make <concept>, eg: make install
 install:  ## Install required javascript dependencies
 ifndef NPM
 ifdef APT
-	@echo "Installing NPM debian package…"
+	@echo "Installing NPM debian package..."
 	sudo apt install -y npm
 endif
 endif
