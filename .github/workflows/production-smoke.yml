@@ -1,0 +1,98 @@
+name: Production smoke test
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check production routes and functions
+        run: |
+          set -euo pipefail
+          base="https://app.mieuxvoter.fr"
+          body=$(mktemp)
+          headers=$(mktemp)
+          trap 'rm -f "$body" "$headers"' EXIT
+
+          check_status() {
+            path="$1"
+            expected="$2"
+            url="$base$path"
+            status=$(curl -sS -o /dev/null -w "%{http_code}" --retry 3 --retry-delay 2 "$url")
+            echo "$path -> $status (expected $expected)"
+            if [ "$status" != "$expected" ]; then
+              echo "Unexpected status for $url"
+              exit 1
+            fi
+          }
+
+          check_page() {
+            path="$1"
+            expected="$2"
+            needle="$3"
+            url="$base$path"
+            status=$(curl -sS -o "$body" -w "%{http_code}" --retry 3 --retry-delay 2 "$url")
+            echo "$path -> $status (expected $expected)"
+            if [ "$status" != "$expected" ]; then
+              echo "Unexpected status for $url"
+              exit 1
+            fi
+            if ! grep -qF -- "$needle" "$body"; then
+              echo "Missing expected content on $url: $needle"
+              exit 1
+            fi
+          }
+
+          check_not_500() {
+            path="$1"
+            url="$base$path"
+            status=$(curl -sS -o /dev/null -w "%{http_code}" --retry 3 --retry-delay 2 "$url")
+            echo "$path -> $status"
+            case "$status" in
+              200|404) ;;
+              *)
+                echo "Unexpected status for $url: $status"
+                exit 1
+                ;;
+            esac
+          }
+
+          check_page "/fr" 200 "Organisez un vote"
+          check_page "/en" 200 "Organize a vote"
+          check_status "/fr/faq" 200
+          check_status "/fr/admin/new" 200
+          check_status "/fr/privacy-policy" 200
+          check_status "/fr/legal-notices" 200
+          check_status "/fr/maintenance" 200
+          check_status "/fr/errors/restricted" 200
+
+          result_path="/fr/result?mentions=%5B%22Excellent%22%2C%22Bien%22%2C%22Passable%22%5D&candidatsAndResults=%5B%5B%22Alice%22%2C10%2C0%2C0%5D%2C%5B%22Bob%22%2C5%2C5%2C0%5D%5D"
+          check_page "$result_path" 200 "Alice"
+
+          check_status "/fr/votes/aaaa-bbbb-cccc" 404
+          check_not_500 "/fr/results/aaaa-bbbb-cccc"
+          check_not_500 "/fr/admin/aaaa-bbbb-cccc/cccc-dddd-eeee"
+          check_status "/fr/this-does-not-exist" 404
+
+          function_url="$base/.netlify/functions/send-emails"
+          status=$(curl -sS -o /dev/null -w "%{http_code}" --retry 3 --retry-delay 2 "$function_url")
+          echo "send-emails GET -> $status (expected 405)"
+          test "$status" = "405"
+
+          status=$(curl -sS -o /dev/null -w "%{http_code}" --retry 3 --retry-delay 2 -X POST -H "Content-Type: application/json" -d '{}' "$function_url")
+          echo "send-emails POST {} -> $status (expected 422)"
+          test "$status" = "422"
+
+          status=$(curl -sS -o /dev/null -w "%{http_code}" --retry 3 --retry-delay 2 "$base/logos/logo.svg")
+          echo "/logos/logo.svg -> $status (expected 200)"
+          test "$status" = "200"
+
+          curl -sS -D "$headers" -o /dev/null --retry 3 --retry-delay 2 "$base/"
+          grep -qi '^strict-transport-security:' "$headers"
+          echo "HSTS header present"
