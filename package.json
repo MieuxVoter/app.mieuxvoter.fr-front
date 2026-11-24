@@ -31,7 +31,7 @@
 		"dotenv": "^8.6.0",
 		"embla-carousel-react": "^7.0.4",
 		"framer-motion": "^7.6.4",
-		"i18next": "^25.6.2",
+		"i18next": "^27.2.7",
 		"jspdf": "^4.2.1",
 		"logrocket": "^5.0.1",
 		"next": "^16.4.5",
